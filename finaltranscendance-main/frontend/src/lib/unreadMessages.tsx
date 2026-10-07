@@ -75,6 +75,7 @@ export function UnreadMessagesProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (!user) return;
     userIdRef.current = user.id;
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- per-user state reloaded on login
     setLastReadByChannel(loadStoredReadState(user.id));
     setActivitySeenAt(loadStoredActivitySeen(user.id));
   }, [user]);
@@ -192,6 +193,7 @@ export function UnreadMessagesProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     if (!user || profile?.role !== 'admin') return;
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- initial data fetch
     loadLatestActivity();
     const unsubscribe = subscribeToChanges(() => loadLatestActivity());
     return unsubscribe;

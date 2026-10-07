@@ -1,12 +1,12 @@
 import { Router } from 'express';
-import { PrismaClient, FriendshipStatus } from '@prisma/client';
+import { FriendshipStatus } from '@prisma/client';
+import { prisma } from '../lib/prisma.js';
 import {
   requireAuth,
   type AuthenticatedRequest,
 } from '../middleware/auth.js';
 
 const router = Router();
-const prisma = new PrismaClient();
 
 // ============================================================
 // GET /api/friends

@@ -1,4 +1,5 @@
-FROM node:20-bookworm
+# ---- Build stage ----
+FROM node:20-bookworm AS build
 
 WORKDIR /app
 
@@ -7,11 +8,17 @@ RUN npm ci
 
 COPY . .
 
-ARG VITE_API_URL
+# Relative by default: the API is served by the same nginx (same origin),
+# so the app works whatever the hostname used to reach it.
+ARG VITE_API_URL=/api
 ENV VITE_API_URL=$VITE_API_URL
 
 RUN npm run build
 
-EXPOSE 5173
+# ---- Runtime stage: static files served by nginx ----
+FROM nginx:1.27-alpine
 
-CMD ["npm", "run", "preview", "--", "--host", "0.0.0.0", "--port", "5173"]
+COPY nginx-spa.conf /etc/nginx/conf.d/default.conf
+COPY --from=build /app/dist /usr/share/nginx/html
+
+EXPOSE 80

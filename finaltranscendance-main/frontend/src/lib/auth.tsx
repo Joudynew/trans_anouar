@@ -72,7 +72,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       if (!payload.exp || payload.exp * 1000 <= Date.now()) {
         localStorage.removeItem('token');
-        // eslint-disable-next-line react-hooks/set-state-in-effect
         setLoading(false);
         return;
       }
@@ -90,13 +89,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           setProfile(null);
         })
         .finally(() => {
-          // eslint-disable-next-line react-hooks/set-state-in-effect
           setLoading(false);
         });
     } catch {
       localStorage.removeItem('token');
       setProfile(null);
-      // eslint-disable-next-line react-hooks/set-state-in-effect
       setLoading(false);
     }
   }, []);

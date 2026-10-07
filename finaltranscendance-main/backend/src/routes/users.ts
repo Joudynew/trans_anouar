@@ -2,9 +2,9 @@ import { Router } from 'express';
 import bcrypt from 'bcryptjs';
 import multer from 'multer';
 import fs from 'node:fs';
-import path from 'node:path';
 import crypto from 'node:crypto';
 import { z } from 'zod';
+import type { Prisma } from '@prisma/client';
 import { prisma } from '../lib/prisma.js';
 import { requireAuth, type AuthenticatedRequest } from '../middleware/auth.js';
 
@@ -18,8 +18,14 @@ fs.mkdirSync('uploads/avatars', { recursive: true });
 const avatarStorage = multer.diskStorage({
   destination: (_req, _file, cb) => cb(null, 'uploads/avatars'),
   filename: (_req, file, cb) => {
-    const ext = path.extname(file.originalname);
-    cb(null, `${crypto.randomUUID()}${ext}`);
+    // Extension derived from the validated MIME type, never from the
+    // client-supplied file name (avoids uploading e.g. "avatar.html").
+    const extByMime: Record<string, string> = {
+      'image/png': '.png',
+      'image/jpeg': '.jpg',
+      'image/webp': '.webp',
+    };
+    cb(null, `${crypto.randomUUID()}${extByMime[file.mimetype] ?? '.bin'}`);
   },
 });
 
@@ -160,9 +166,6 @@ router.post('/', requireAuth, async (req: AuthenticatedRequest, res) => {
   const parsed = createUserSchema.safeParse(req.body);
 
   if (!parsed.success) {
-    console.error('CREATE USER VALIDATION ERROR:', parsed.error.flatten());
-    console.error('CREATE USER BODY:', req.body);
-
     return res.status(400).json({
       error: 'Invalid payload',
       issues: parsed.error.flatten(),
@@ -388,18 +391,28 @@ router.patch('/:id', requireAuth, async (req: AuthenticatedRequest, res) => {
       status,
     } = req.body ?? {};
 
-    const data: any = {};
+    const data: Prisma.UserUpdateInput = {};
 
     if (typeof fullName === 'string' && fullName.trim()) {
+      if (fullName.trim().length < 2 || fullName.trim().length > 100) {
+        return res.status(400).json({ error: 'Nom invalide' });
+      }
       data.fullName = fullName.trim();
     }
 
     if (typeof phone === 'string') {
+      if (phone.trim().length > 30) {
+        return res.status(400).json({ error: 'Téléphone invalide' });
+      }
       data.phone = phone.trim() || null;
     }
 
     if (typeof email === 'string' && email.trim()) {
       const normalizedEmail = email.trim().toLowerCase();
+
+      if (!z.string().email().safeParse(normalizedEmail).success) {
+        return res.status(400).json({ error: 'Email invalide' });
+      }
 
       if (normalizedEmail !== target.email.toLowerCase()) {
         const existing = await prisma.user.findUnique({

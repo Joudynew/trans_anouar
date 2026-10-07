@@ -52,7 +52,7 @@ export function TechProfileModal({ technician, interventions, onClose }: { techn
     interventions.forEach((interv, idx) => {
       if (interv.technician_id !== technician.id) return;
       reportResults[idx].forEach((r: unknown) => {
-        allReports.push({ ...(r as any), intervention: interv } as InterventionReportWithIntervention);
+        allReports.push({ ...(r as InterventionReportWithIntervention), intervention: interv });
       });
     });
     allReports.sort((a, b) => b.created_at.localeCompare(a.created_at));

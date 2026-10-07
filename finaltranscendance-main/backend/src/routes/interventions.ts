@@ -2,18 +2,47 @@ import crypto from 'node:crypto';
 import { Router } from 'express';
 import { z } from 'zod';
 import { prisma } from '../lib/prisma.js';
-import { requireAuth, type AuthenticatedRequest } from '../middleware/auth.js';
+import {
+  requireAuth,
+  isAdmin,
+  isInCallerOrg,
+  publicUserSelect,
+  type AuthenticatedRequest,
+} from '../middleware/auth.js';
 
 const router = Router();
 
 const createSchema = z.object({
-  clientName: z.string(),
-  clientAddress: z.string(),
-  fibreSocket: z.string(),
-  description: z.string(),
-  priority: z.enum(['LOW', 'MEDIUM', 'HIGH']).default('MEDIUM'),
-  technicianId: z.string().nullable().optional(),
-  scheduledAt: z.string(),
+  clientName: z.string().trim().min(1).max(200),
+  clientAddress: z.string().trim().min(1).max(300),
+  fibreSocket: z.string().trim().min(1).max(100),
+  description: z.string().trim().min(1).max(2000),
+  priority: z.enum(['LOW', 'MEDIUM', 'HIGH', 'CRITICAL']).default('MEDIUM'),
+  technicianId: z.string().uuid().nullable().optional(),
+  scheduledAt: z.string().datetime(),
+});
+
+const activitySchema = z.object({
+  interventionId: z.string().uuid().nullable().optional(),
+  technicianId: z.string().uuid().nullable().optional(),
+  action: z.enum(['created', 'status_changed', 'closed', 'failed']),
+  detail: z.string().max(500).nullable().optional(),
+});
+
+const statusSchema = z.object({
+  status: z.enum(['ASSIGNED', 'EN_ROUTE', 'IN_PROGRESS', 'COMPLETED', 'FAILED']),
+  technicianId: z.string().uuid().nullable().optional(),
+});
+
+const reportSchema = z.object({
+  technicianId: z.string().uuid(),
+  content: z.string().trim().min(1).max(5000),
+  actionTaken: z.string().trim().max(2000).nullable().optional(),
+});
+
+const satisfactionSchema = z.object({
+  rating: z.number().int().min(1).max(5),
+  comment: z.string().max(1000).nullable().optional(),
 });
 
 router.get('/:id', requireAuth, async (req: AuthenticatedRequest, res) => {
@@ -152,7 +181,19 @@ router.post('/', requireAuth, async (req: AuthenticatedRequest, res) => {
     });
   }
 
+  if (!isAdmin(req)) {
+    return res.status(403).json({
+      error: 'Seul un administrateur peut créer une intervention',
+    });
+  }
+
   const data = parsed.data;
+
+  if (data.technicianId && !(await isInCallerOrg(req, data.technicianId))) {
+    return res.status(400).json({
+      error: 'Technicien invalide pour cette organisation',
+    });
+  }
 
   const scheduledAt = new Date(data.scheduledAt);
 
@@ -197,13 +238,33 @@ router.post('/activity', requireAuth, async (req: AuthenticatedRequest, res) => 
     });
   }
 
+  const parsed = activitySchema.safeParse(req.body);
+  if (!parsed.success) {
+    return res.status(400).json({ error: 'Invalid payload', issues: parsed.error.flatten() });
+  }
+  const { interventionId, technicianId, action, detail } = parsed.data;
+
+  if (interventionId) {
+    const intervention = await prisma.intervention.findUnique({
+      where: { id: interventionId },
+      select: { organizationId: true },
+    });
+    if (!intervention || intervention.organizationId !== req.authOrganizationId) {
+      return res.status(403).json({ error: 'Accès refusé à cette intervention' });
+    }
+  }
+
+  if (technicianId && !(await isInCallerOrg(req, technicianId))) {
+    return res.status(400).json({ error: 'Technicien invalide pour cette organisation' });
+  }
+
   const activity = await prisma.activityLog.create({
     data: {
       organizationId: req.authOrganizationId,
-      interventionId: req.body.interventionId,
-      technicianId: req.body.technicianId ?? null,
-      action: req.body.action,
-      detail: req.body.detail ?? null,
+      interventionId: interventionId ?? null,
+      technicianId: technicianId ?? null,
+      action,
+      detail: detail ?? null,
     },
   });
 
@@ -269,14 +330,15 @@ router.get('/activity/org/:orgId', requireAuth, async (req: AuthenticatedRequest
     });
   }
 
-  const limit = Number(req.query.limit ?? 50);
+  const rawLimit = Number(req.query.limit ?? 50);
+  const limit = Number.isInteger(rawLimit) ? Math.min(Math.max(rawLimit, 1), 200) : 50;
 
   const activities = await prisma.activityLog.findMany({
     where: {
       organizationId: String(req.params.orgId),
     },
     include: {
-      technician: true,
+      technician: { select: publicUserSelect },
       intervention: {
         select: {
           id: true,
@@ -296,17 +358,15 @@ router.get('/activity/org/:orgId', requireAuth, async (req: AuthenticatedRequest
 
 
 router.patch('/:id/status', requireAuth, async (req: AuthenticatedRequest, res) => {
-  const { status, technicianId } = req.body;
-
-  if (!status) {
-    return res.status(400).json({
-      error: 'Status required',
-    });
+  const parsed = statusSchema.safeParse(req.body);
+  if (!parsed.success) {
+    return res.status(400).json({ error: 'Statut invalide', issues: parsed.error.flatten() });
   }
+  const { status, technicianId } = parsed.data;
 
   const existing = await prisma.intervention.findUnique({
     where: { id: String(req.params.id) },
-    select: { organizationId: true },
+    select: { organizationId: true, technicianId: true },
   });
 
   if (!existing) {
@@ -322,6 +382,17 @@ router.patch('/:id/status', requireAuth, async (req: AuthenticatedRequest, res) 
     return res.status(403).json({
       error: 'Accès refusé à cette intervention',
     });
+  }
+
+  // Only admins or the technician assigned to the intervention can change it.
+  if (!isAdmin(req) && existing.technicianId !== req.authUserId) {
+    return res.status(403).json({
+      error: 'Seul le technicien assigné peut modifier cette intervention',
+    });
+  }
+
+  if (technicianId && !(await isInCallerOrg(req, technicianId))) {
+    return res.status(400).json({ error: 'Technicien invalide pour cette organisation' });
   }
 
   const intervention = await prisma.intervention.update({
@@ -394,12 +465,18 @@ router.get('/:id/reports', requireAuth, async (req: AuthenticatedRequest, res) =
 
 
 router.post('/:id/reports', requireAuth, async (req: AuthenticatedRequest, res) => {
-  const { technicianId, content, actionTaken } = req.body;
+  const parsed = reportSchema.safeParse(req.body);
+  if (!parsed.success) {
+    return res.status(400).json({ error: 'Missing report data', issues: parsed.error.flatten() });
+  }
+  const { technicianId, content, actionTaken } = parsed.data;
 
-  if (!technicianId || !content) {
-    return res.status(400).json({
-      error: 'Missing report data',
-    });
+  // A technician can only write reports in their own name.
+  if (!isAdmin(req) && technicianId !== req.authUserId) {
+    return res.status(403).json({ error: 'Forbidden' });
+  }
+  if (!(await isInCallerOrg(req, technicianId))) {
+    return res.status(400).json({ error: 'Technicien invalide pour cette organisation' });
   }
 
   const intervention = await prisma.intervention.findUnique({
@@ -497,13 +574,13 @@ router.get('/satisfaction/:token', async (req, res) => {
 
 
 router.post('/satisfaction/:token', async (req, res) => {
-  const { rating, comment } = req.body;
-
-  if (!Number.isInteger(rating) || rating < 1 || rating > 5) {
+  const parsed = satisfactionSchema.safeParse(req.body);
+  if (!parsed.success) {
     return res.status(400).json({
       error: 'La note doit être comprise entre 1 et 5',
     });
   }
+  const { rating, comment } = parsed.data;
 
   const intervention = await prisma.intervention.findUnique({
     where: {
@@ -534,7 +611,7 @@ router.post('/satisfaction/:token', async (req, res) => {
       data: {
         interventionId: intervention.id,
         rating,
-        comment: typeof comment === 'string' ? comment.trim() || null : null,
+        comment: comment?.trim() || null,
       },
     }),
 

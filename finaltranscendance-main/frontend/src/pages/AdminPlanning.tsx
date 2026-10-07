@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo, useEffect, useCallback } from 'react';
 import { useToast } from '@/components/Toast';
 import { Modal } from '@/components/Modal';
 import { Spinner, EmptyState } from '@/components/Feedback';
@@ -43,7 +43,10 @@ export function AdminPlanning({
     return () => clearInterval(interval);
   }, []);
 
-  const techName = (id: string | null) => technicians.find((t) => t.id === id)?.full_name ?? 'Non assigné';
+  const techName = useCallback(
+    (id: string | null) => technicians.find((t) => t.id === id)?.full_name ?? 'Non assigné',
+    [technicians]
+  );
 
   const filtered = useMemo(() => {
     return interventions
@@ -76,7 +79,7 @@ export function AdminPlanning({
 
         return dateB - dateA;
       });
-  }, [interventions, search, statusFilter, technicians, now, techName]);
+  }, [interventions, search, statusFilter, now, techName]);
 
   const handleCreate = async () => {
     if (saving) return;
