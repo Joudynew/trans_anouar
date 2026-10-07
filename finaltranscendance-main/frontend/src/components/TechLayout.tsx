@@ -1,4 +1,3 @@
-import { Avatar } from "@/components/Avatar";
 import { type ReactNode } from 'react';
 import { useAuth } from '@/lib/auth';
 import { getUnreadNotificationCount, uploadAvatar } from '@/lib/api';

@@ -1,8 +1,11 @@
 import { Router } from 'express';
+import { z } from 'zod';
 import { prisma } from '../lib/prisma.js';
 import { requireAuth, type AuthenticatedRequest } from '../middleware/auth.js';
 
 const router = Router();
+
+const orgSchema = z.object({ name: z.string().trim().min(2).max(100) });
 
 router.get('/', requireAuth, async (req: AuthenticatedRequest, res) => {
   const user = await prisma.user.findUnique({
@@ -38,9 +41,14 @@ router.post('/', requireAuth, async (req: AuthenticatedRequest, res) => {
     });
   }
 
+  const parsed = orgSchema.safeParse(req.body);
+  if (!parsed.success) {
+    return res.status(400).json({ error: 'Nom d’organisation invalide' });
+  }
+
   const organization = await prisma.organization.create({
     data: {
-      name: req.body.name,
+      name: parsed.data.name,
     },
   });
 
@@ -62,12 +70,17 @@ router.patch('/:id', requireAuth, async (req: AuthenticatedRequest, res) => {
     });
   }
 
+  const parsed = orgSchema.safeParse(req.body);
+  if (!parsed.success) {
+    return res.status(400).json({ error: 'Nom d’organisation invalide' });
+  }
+
   const organization = await prisma.organization.update({
     where: {
       id: String(req.params.id),
     },
     data: {
-      name: req.body.name,
+      name: parsed.data.name,
     },
   });
 

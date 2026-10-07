@@ -1,7 +1,18 @@
 import { Router } from 'express';
 import { z } from 'zod';
 import { prisma } from '../lib/prisma.js';
-import { requireAuth, type AuthenticatedRequest } from '../middleware/auth.js';
+import {
+  requireAuth,
+  isInCallerOrg,
+  type AuthenticatedRequest,
+} from '../middleware/auth.js';
+
+const senderSelect = {
+  id: true,
+  fullName: true,
+  email: true,
+  avatarUrl: true,
+} as const;
 
 const router = Router();
 
@@ -22,6 +33,10 @@ router.get(
 
       if (!userId) {
         return res.status(401).json({ error: 'Unauthorized' });
+      }
+
+      if (orgId !== req.authOrganizationId) {
+        return res.status(403).json({ error: 'Accès refusé à cette organisation' });
       }
 
       const channels = await prisma.channel.findMany({
@@ -49,7 +64,7 @@ router.get(
             },
             take: 1,
             include: {
-              sender: true,
+              sender: { select: senderSelect },
             },
           },
         },
@@ -85,7 +100,7 @@ router.post(
 
       const schema = z.object({
         organizationId: z.string(),
-        name: z.string().min(1),
+        name: z.string().trim().min(1).max(100),
         type: z.enum(['DM', 'GROUP']).default('GROUP'),
         targetUserId: z.string().optional(),
       });
@@ -109,6 +124,14 @@ router.post(
         return res.status(400).json({
           error: 'targetUserId is required for DM',
         });
+      }
+
+      if (organizationId !== req.authOrganizationId) {
+        return res.status(403).json({ error: 'Accès refusé à cette organisation' });
+      }
+
+      if (targetUserId && !(await isInCallerOrg(req, targetUserId))) {
+        return res.status(400).json({ error: 'Utilisateur invalide pour cette organisation' });
       }
 
       const channel = await prisma.channel.create({
@@ -196,6 +219,13 @@ router.post(
         });
       }
 
+      if (
+        channel.organizationId !== req.authOrganizationId ||
+        !(await isInCallerOrg(req, parsed.data.userId))
+      ) {
+        return res.status(403).json({ error: 'Forbidden' });
+      }
+
       const member = await prisma.channelMember.upsert({
         where: {
           channelId_userId: {
@@ -257,13 +287,7 @@ router.get(
           channelId,
         },
         include: {
-          sender: {
-            select: {
-              id: true,
-              fullName: true,
-              email: true,
-            },
-          },
+          sender: { select: senderSelect },
         },
         orderBy: {
           createdAt: 'asc',
@@ -297,7 +321,7 @@ router.post(
 
       const schema = z.object({
         channelId: z.string(),
-        content: z.string().min(1),
+        content: z.string().trim().min(1).max(2000),
       });
 
       const parsed = schema.safeParse(req.body);
@@ -331,13 +355,7 @@ router.post(
           content,
         },
         include: {
-          sender: {
-            select: {
-              id: true,
-              fullName: true,
-              email: true,
-            },
-          },
+          sender: { select: senderSelect },
         },
       });
 

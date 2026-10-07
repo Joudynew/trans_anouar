@@ -1,4 +1,3 @@
-import { Avatar } from "@/components/Avatar";
 import { useEffect, useMemo, useState, useCallback } from 'react';
 import {
   Users,
@@ -97,6 +96,7 @@ export function TechFriends() {
   useEffect(() => {
     if (!profile?.id || !orgId) return;
 
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- initial data fetch
     loadFriends();
 
     const interval = setInterval(loadFriends, 3000);
