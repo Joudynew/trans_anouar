@@ -1,3 +1,4 @@
+# CLAUDE-MODIF (2026-10-07) — NOUVEAU fichier : exclut node_modules/dist/.env de l'image Docker.
 node_modules
 dist
 uploads

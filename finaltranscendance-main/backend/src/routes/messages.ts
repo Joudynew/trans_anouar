@@ -1,3 +1,4 @@
+// CLAUDE-MODIF (2026-10-07) — MODIFIÉ : contrôle d'organisation (liste/création de salons, ajout de membres), passwordHash retiré (sender), longueur des messages limitée.
 import { Router } from 'express';
 import { z } from 'zod';
 import { prisma } from '../lib/prisma.js';

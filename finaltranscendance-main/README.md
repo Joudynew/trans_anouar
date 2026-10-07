@@ -216,3 +216,5 @@ audit, documentation drafting, debugging) and on which parts of the project.
 
 - The TLS certificate is self-signed (local evaluation only).
 - The JWT is stored in `localStorage`; logout is client-side only (token valid until expiry, 7 days).
+
+<!-- CLAUDE-MODIF (2026-10-07) — NOUVEAU fichier : squelette du README exigé par le sujet (sections TODO à compléter). -->

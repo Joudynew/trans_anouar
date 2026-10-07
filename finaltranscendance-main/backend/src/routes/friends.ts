@@ -1,3 +1,4 @@
+// CLAUDE-MODIF (2026-10-07) — MODIFIÉ : utilise le PrismaClient partagé (lib/prisma) au lieu d'en créer un nouveau.
 import { Router } from 'express';
 import { FriendshipStatus } from '@prisma/client';
 import { prisma } from '../lib/prisma.js';

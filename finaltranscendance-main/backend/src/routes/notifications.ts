@@ -1,3 +1,4 @@
+// CLAUDE-MODIF (2026-10-07) — MODIFIÉ : utilise le PrismaClient partagé (lib/prisma).
 import { Router } from 'express';
 import { prisma } from '../lib/prisma.js';
 import { requireAuth, type AuthenticatedRequest } from '../middleware/auth.js';

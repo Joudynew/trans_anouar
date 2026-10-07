@@ -1,3 +1,4 @@
+# CLAUDE-MODIF (2026-10-07) — NOUVEAU fichier : config HTTPS (en-têtes de sécurité, frontend statique, timeouts WebSocket, redirection vers HTTPS_PORT).
 server {
     listen 80;
     server_name _;

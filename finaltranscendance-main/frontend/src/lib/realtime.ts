@@ -1,3 +1,4 @@
+// CLAUDE-MODIF (2026-10-07) — MODIFIÉ : envoie le token JWT au WebSocket, se connecte seulement si connecté, se reconnecte au changement de compte.
 type ChangeHandler = () => void;
 
 let socket: WebSocket | null = null;

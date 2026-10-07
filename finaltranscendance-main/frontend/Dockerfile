@@ -1,3 +1,4 @@
+# CLAUDE-MODIF (2026-10-07) — MODIFIÉ : build multi-étapes, fichiers statiques servis par nginx (au lieu de vite preview), VITE_API_URL=/api par défaut.
 # ---- Build stage ----
 FROM node:20-bookworm AS build
 

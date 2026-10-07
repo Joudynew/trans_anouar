@@ -1,3 +1,4 @@
+# CLAUDE-MODIF (2026-10-07) — MODIFIÉ : variables via .env, restart, adminer retiré, nginx construit (certs auto), ports 8080/8443 configurables.
 services:
   db:
     image: postgres:15

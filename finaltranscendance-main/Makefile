@@ -1,3 +1,4 @@
+# CLAUDE-MODIF (2026-10-07) — NOUVEAU fichier : déploiement en une commande (`make`), crée .env avec secrets aléatoires.
 # Déploiement en une seule commande : `make`
 
 all: up

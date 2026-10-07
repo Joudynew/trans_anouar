@@ -1,3 +1,4 @@
+// CLAUDE-MODIF (2026-10-07) — MODIFIÉ : directives eslint-disable inutiles supprimées.
 /**
  * ============================================================
  * CONTEXTE D'AUTHENTIFICATION (remplace Supabase Auth)

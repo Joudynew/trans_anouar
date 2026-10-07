@@ -1,3 +1,4 @@
+// CLAUDE-MODIF (2026-10-07) — MODIFIÉ : WebSocket authentifié par JWT (?token=), diffusion limitée à la même organisation.
 import { WebSocketServer, WebSocket } from 'ws';
 import type { IncomingMessage, Server } from 'node:http';
 import { verifyAuthToken } from './lib/jwt.js';

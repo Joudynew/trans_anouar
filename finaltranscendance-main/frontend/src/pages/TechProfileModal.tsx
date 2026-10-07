@@ -1,3 +1,4 @@
+// CLAUDE-MODIF (2026-10-07) — MODIFIÉ : suppression d'un `any` (erreur ESLint).
 import { Avatar } from "@/components/Avatar";
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import {

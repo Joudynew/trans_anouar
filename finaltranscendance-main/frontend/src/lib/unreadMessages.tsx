@@ -1,3 +1,4 @@
+// CLAUDE-MODIF (2026-10-07) — MODIFIÉ : erreurs ESLint react-hooks/set-state-in-effect traitées.
 /**
  * ============================================================
  * SUIVI DES MESSAGES NON LUS

@@ -1,3 +1,4 @@
+// CLAUDE-MODIF (2026-10-07) — MODIFIÉ : middleware async, rejet des comptes INACTIVE, ajout authRole + helpers isAdmin / isInCallerOrg / publicUserSelect.
 import type { NextFunction, Request, Response } from 'express';
 import type { Role } from '@prisma/client';
 import { verifyAuthToken } from '../lib/jwt.js';

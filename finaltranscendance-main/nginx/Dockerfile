@@ -1,3 +1,4 @@
+# CLAUDE-MODIF (2026-10-07) — NOUVEAU fichier : image nginx qui génère le certificat TLS au démarrage et rend le template de config.
 FROM nginx:1.27-alpine
 
 RUN apk add --no-cache openssl

@@ -1,3 +1,4 @@
+// CLAUDE-MODIF (2026-10-07) — MODIFIÉ : arrêt clair si JWT_SECRET absent/trop court, vérification du contenu du token.
 import jwt from "jsonwebtoken";
 
 const jwtSecret = process.env.JWT_SECRET;

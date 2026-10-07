@@ -1,3 +1,4 @@
+// CLAUDE-MODIF (2026-10-07) — MODIFIÉ : import inutilisé supprimé + erreur ESLint set-state-in-effect traitée.
 import { useEffect, useMemo, useState, useCallback } from 'react';
 import {
   Users,

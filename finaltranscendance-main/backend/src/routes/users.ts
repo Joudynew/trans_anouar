@@ -1,3 +1,4 @@
+// CLAUDE-MODIF (2026-10-07) — MODIFIÉ : extension d'avatar déduite du type MIME (anti-upload .html), plus de log du mot de passe, validation email/nom/téléphone au PATCH.
 import { Router } from 'express';
 import bcrypt from 'bcryptjs';
 import multer from 'multer';

@@ -1,3 +1,4 @@
+// CLAUDE-MODIF (2026-10-07) — MODIFIÉ : techName en useCallback (avertissement react-hooks/exhaustive-deps).
 import { useState, useMemo, useEffect, useCallback } from 'react';
 import { useToast } from '@/components/Toast';
 import { Modal } from '@/components/Modal';

@@ -1,3 +1,4 @@
+// CLAUDE-MODIF (2026-10-07) — MODIFIÉ : validation Zod (création, statut, activité, rapports, satisfaction), création réservée aux admins, statut modifiable par le technicien assigné ou un admin, contrôles d'organisation, passwordHash retiré de l'activité.
 import crypto from 'node:crypto';
 import { Router } from 'express';
 import { z } from 'zod';

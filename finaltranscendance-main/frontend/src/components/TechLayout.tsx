@@ -1,3 +1,4 @@
+// CLAUDE-MODIF (2026-10-07) — MODIFIÉ : import inutilisé (Avatar) supprimé (erreur ESLint).
 import { type ReactNode } from 'react';
 import { useAuth } from '@/lib/auth';
 import { getUnreadNotificationCount, uploadAvatar } from '@/lib/api';

@@ -1,4 +1,5 @@
 #!/bin/sh
+# CLAUDE-MODIF (2026-10-07) — MODIFIÉ : exécuté automatiquement au démarrage du conteneur nginx (plus d'étape manuelle).
 # Generates a self-signed TLS certificate at container start-up if none is
 # present, so `docker compose up` works on a fresh clone with no manual step.
 set -e

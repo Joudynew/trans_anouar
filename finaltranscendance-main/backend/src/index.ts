@@ -1,3 +1,4 @@
+// CLAUDE-MODIF (2026-10-07) — MODIFIÉ : express-async-errors (plus de crash), middleware d'erreur global, CORS via FRONTEND_URL, en-têtes nosniff sur /uploads, seed du super admin.
 import 'dotenv/config';
 // Must be imported before routes: forwards rejected promises of async route
 // handlers to the error middleware instead of crashing the Node process.

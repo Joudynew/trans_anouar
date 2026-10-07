@@ -1,3 +1,4 @@
+// CLAUDE-MODIF (2026-10-07) — NOUVEAU fichier : crée le premier SUPER_ADMIN au démarrage depuis le .env (remplace prisma/create-admin.ts).
 import bcrypt from 'bcryptjs';
 import { prisma } from './lib/prisma.js';
 
