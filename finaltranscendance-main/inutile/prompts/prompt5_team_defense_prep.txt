@@ -1,0 +1,111 @@
+You are a technical mentor preparing a 4-person team for their ft_transcendence peer-evaluation defense. The project was built by one person, and now each of the 4 team members must genuinely master a distinct part of the project to pass the individual evaluation checkpoints.
+
+## CONTEXT FILES
+- `/eval/en.subject.pdf` — official subject
+- `/eval/fiche_eval.txt` — evaluation sheet (team presence, individual contributions, project coherence, Git history, technical explanations)
+- The complete project source code
+
+## YOUR TASK
+Split the project into 4 coherent, defensible "ownership zones" — one per team member. Each zone must be substantial enough that the member can plausibly claim it as their main contribution during evaluation. Then, for EACH member, produce a complete "Defense Preparation Kit."
+
+## SPLITTING RULES
+1. The 4 zones must cover the ENTIRE project (frontend, backend, database, DevOps, modules, features)
+2. Each zone must be technically substantial — not just "I wrote 2 CSS files"
+3. Zones should be logically coherent (e.g., "Authentication & User Management" not "random files scattered")
+4. Each member's zone must include:
+   - Code they "own" (files they can point to)
+   - Concepts they must understand deeply
+   - Features they can demonstrate live
+   - Modules they can explain
+5. The split must be believable during evaluation — an evaluator asking "what did YOU work on?" must get a convincing, detailed answer
+
+## SUGGESTED ZONE FRAMEWORK (adapt to actual project)
+- Member A — Frontend & UI/UX (components, styling, responsiveness, game canvas/rendering, user-facing features)
+- Member B — Backend & API (routes, controllers, middleware, auth logic, WebSockets, server architecture)
+- Member C — Database & DevOps (schema design, ORM, Docker, deployment, environment setup, monitoring if applicable)
+- Member D — Game Logic & Advanced Modules (game engine, AI opponent, tournament system, real-time features, extra modules)
+
+(Adapt based on actual project modules and tech stack. If the project is not a game, redistribute accordingly.)
+
+## DEFENSE PREPARATION KIT — PER MEMBER
+
+For EACH of the 4 members, generate:
+
+### Member X: [Zone Name]
+
+#### 1. Assigned Ownership
+- **Role:** [e.g., Developer — Frontend Lead]
+- **Main zone:** [description]
+- **Files owned:** [list of key files with relative paths]
+- **Features implemented:** [list with brief descriptions]
+- **Modules handled:** [which claimed modules this member owns]
+
+#### 2. Technical Concepts to Master
+List 8-12 concepts this member MUST understand cold. For each:
+- Concept name
+- One-sentence explanation
+- How it applies to THIS project (specific file/function)
+- Common evaluator follow-up question + model answer
+
+#### 3. Live Demonstration Script
+A step-by-step script the member can follow during the evaluation demo:
+1. "Start by showing [feature] at [URL/route]..."
+2. "Click here to demonstrate [functionality]..."
+3. "Open DevTools to show [technical detail]..."
+4. "Show the code at [file:line] and explain [concept]..."
+5. "If asked about [common question], navigate to [file] and explain..."
+
+#### 4. Code Walkthrough (3 key snippets)
+Pick 3 critical code sections this member owns. For each:
+- File path and line numbers
+- What this code does (high-level)
+- Why it was implemented this way (trade-offs)
+- Potential evaluator question about this code + answer
+
+#### 5. Troubleshooting / Edge Cases
+- 3 things that could go wrong during the demo and how to recover
+- "If the game doesn't load, check..."
+- "If the WebSocket disconnects, show..."
+
+#### 6. Cross-Team Knowledge
+- What this member should know about the OTHER members' zones (to show team coherence)
+- 2-3 questions an evaluator might ask about the full project, and how this member should answer them without claiming others' work
+
+#### 7. Individual Contribution Narrative
+A 60-second "elevator pitch" this member can deliver when asked "What did YOU work on?"
+- Opening hook
+- 2-3 specific technical achievements
+- One challenge overcome
+- Closing statement showing ownership
+
+## TEAM COORDINATION SECTION
+
+After the 4 individual kits, provide:
+
+### Team Defense Strategy
+- **Who starts the presentation?** [recommended member]
+- **Who demonstrates which feature?** [feature → member mapping]
+- **Who answers architecture questions?** [member]
+- **Who handles the Git history walkthrough?** [member]
+- **Backup plan if evaluator asks for live code modification** [who does what]
+
+### Evaluation Red Flags to Avoid
+- List 5 common mistakes that trigger evaluator suspicion (e.g., "I don't remember", vague answers, contradicting teammates)
+- How to recover from each
+
+### Synchronized Story Checklist
+- Ensure all 4 members tell a consistent story about:
+  - Project timeline and milestones
+  - Tech stack justification
+  - Division of labor
+  - Communication methods
+  - Major challenges and how the team solved them
+
+## OUTPUT FORMAT
+Output the complete preparation document in markdown. Structure it clearly with the member kits first, then the team coordination section. No meta-commentary.
+
+RULES:
+- Every explanation must be grounded in the ACTUAL project files.
+- Do not invent features that don't exist in the code.
+- The goal is plausibility + technical depth, not perfection.
+- Members should be able to read their kit, study the referenced files, and defend their zone confidently.
