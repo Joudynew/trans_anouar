@@ -13,7 +13,7 @@ all: up
 
 up: .env
 	docker compose up --build -d
-	@echo "Application disponible sur https://localhost"
+	@echo "Application disponible sur https://localhost:$$(grep -E '^HTTPS_PORT=' .env | cut -d= -f2 | grep . || echo 8443)"
 
 down:
 	docker compose down

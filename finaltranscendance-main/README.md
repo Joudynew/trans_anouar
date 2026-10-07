@@ -46,7 +46,10 @@ make
 `make` creates `.env` from `.env.example` (with a random `JWT_SECRET`, database password
 and super-admin password) if it does not exist yet, then runs `docker compose up --build -d`.
 
-Open **https://localhost** (the certificate is self-signed: accept the browser warning).
+Open **https://localhost:8443** (the certificate is self-signed: accept the browser warning).
+Ports default to 8443 (HTTPS) and 8080 (HTTP → HTTPS redirect) because rootless
+Podman/Docker, as used on 42 machines, cannot bind ports below 1024. Change
+`HTTPS_PORT` / `HTTP_PORT` in `.env` if needed.
 
 The first **super admin** account is created at start-up from `SUPER_ADMIN_EMAIL` /
 `SUPER_ADMIN_PASSWORD` in `.env`.
@@ -66,11 +69,12 @@ See `.env.example`. `.env` is ignored by Git and must never be committed.
 | `SUPER_ADMIN_EMAIL` / `SUPER_ADMIN_PASSWORD` | First super-admin account |
 | `VITE_API_URL` | API URL seen by the browser (default `/api`, same origin) |
 | `SERVER_NAME` | Host name for the self-signed TLS certificate |
+| `HTTP_PORT` / `HTTPS_PORT` | Ports published on the host (default 8080 / 8443) |
 
 ## Architecture
 
 ```
-Browser ──HTTPS/WSS──► nginx (443, TLS, reverse proxy)
+Browser ──HTTPS/WSS──► nginx (host 8443 → 443, TLS, reverse proxy)
                          ├── /        → frontend  (React build served by nginx)
                          ├── /api/    → backend   (Express, port 3001)
                          ├── /uploads → backend   (avatars)
@@ -78,7 +82,7 @@ Browser ──HTTPS/WSS──► nginx (443, TLS, reverse proxy)
                                           └──► PostgreSQL (internal network only)
 ```
 
-Port 80 only redirects to HTTPS. The database is not exposed outside Docker.
+HTTP (host port 8080) only redirects to HTTPS. The database is not exposed outside Docker.
 
 ## Team Information
 

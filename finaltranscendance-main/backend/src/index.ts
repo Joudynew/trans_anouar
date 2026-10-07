@@ -18,7 +18,7 @@ const port = Number(process.env.PORT ?? 3001);
 // FRONTEND_URL is the public URL behind the nginx reverse proxy (HTTPS).
 // localhost:5173 is kept for local dev without Docker (npm run dev).
 const allowedOrigins = new Set(
-  [process.env.FRONTEND_URL, 'https://localhost', 'http://localhost:5173'].filter(
+  [process.env.FRONTEND_URL, 'https://localhost', 'https://localhost:8443', 'http://localhost:5173'].filter(
     (o): o is string => !!o
   )
 );
